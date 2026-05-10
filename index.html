@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปกฎหมายครอบครัว - ฉบับเตรียมสอบ</title>
+    <!-- Google Fonts: Prompt for Thai, Inter for English -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="light-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="ph-fill ph-scales"></i>
+                    <div>
+                        <h2>Law Prep</h2>
+                        <p>กฎหมายครอบครัว</p>
+                    </div>
+                </div>
+                <button id="theme-toggle" class="theme-toggle" title="สลับโหมดมืด/สว่าง">
+                    <i class="ph ph-moon"></i>
+                </button>
+            </div>
+
+            <div class="search-container">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="search-input" placeholder="ค้นหามาตราหรือเนื้อหา...">
+            </div>
+
+            <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+            <div class="sidebar-footer">
+                <div class="disclaimer">
+                    <i class="ph ph-info"></i>
+                    ข้อมูลเพื่อการศึกษาและการเตรียมสอบเท่านั้น<br>
+                    อัปเดตล่าสุด: เมษายน 2567
+                </div>
+                <p class="copyright">Designed for Final Exams</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <div class="flowchart-container" id="flowchart-container" style="display: none;">
+                <div class="flowchart-nav">
+                    <button class="flow-nav-btn active" data-phase="1">Phase 1: ทรัพย์สิน</button>
+                    <button class="flow-nav-btn" data-phase="2">Phase 2: การจัดการ</button>
+                    <button class="flow-nav-btn" data-phase="3">Phase 3: หนี้สิน</button>
+                    <button class="flow-nav-btn" data-phase="4">Phase 4: บุตร</button>
+                </div>
+                <svg id="edges-svg" class="edges-layer">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                            <path d="M 0 1 L 10 5 L 0 9 z" fill="#94a3b8" />
+                        </marker>
+                    </defs>
+                </svg>
+                <div id="nodes-layer" class="nodes-layer"></div>
+
+                <div class="controls glass-effect">
+                    <button id="zoom-in" title="ซูมเข้า"><i class="ph ph-plus"></i></button>
+                    <button id="zoom-out" title="ซูมออก"><i class="ph ph-minus"></i></button>
+                    <button id="reset-view" title="จัดกึ่งกลาง"><i class="ph ph-arrows-out-cardinal"></i></button>
+                </div>
+
+                <!-- Flow Detail Side Panel -->
+                <div id="flow-detail-panel" class="flow-detail-panel">
+                    <div class="fdp-header">
+                        <h3 id="fdp-title"></h3>
+                        <button id="fdp-close" title="ปิด"><i class="ph ph-x"></i></button>
+                    </div>
+                    <div class="fdp-body">
+                        <div id="fdp-detail" class="fdp-detail"></div>
+                        <div id="fdp-extended" class="fdp-extended" style="display: none;"></div>
+                        
+                        <div id="fdp-example-wrapper" class="fdp-example-wrapper" style="display: none;">
+                            <div class="fdp-section-title"><i class="ph ph-lightbulb"></i> ตัวอย่างประกอบ</div>
+                            <div id="fdp-example" class="fdp-example"></div>
+                        </div>
+
+                        <div id="fdp-caution-wrapper" class="fdp-caution-wrapper" style="display: none;">
+                            <div class="fdp-section-title text-danger"><i class="ph ph-warning-circle"></i> ข้อควรระวัง / จุดหลอก</div>
+                            <div id="fdp-caution" class="fdp-caution"></div>
+                        </div>
+
+                        <div id="fdp-law-wrapper" class="fdp-law-wrapper">
+                            <div id="fdp-law" class="fdp-law"></div>
+                        </div>
+                        <div id="fdp-source" class="fdp-source">
+                            <a href="#" id="fdp-source-link" target="_blank">
+                                <i class="ph ph-book-open-text"></i> อ่านตัวบทกฎหมายฉบับเต็ม
+                            </a>
+                        </div>
+                    </div>
+                    <div class="fdp-footer">
+                        <button id="fdp-go-content" class="btn-primary"><i class="ph ph-arrow-square-out"></i> เปิดหน้าเนื้อหาเต็ม</button>
+                    </div>
+                </div>
+
+                <div class="flow-legend">
+                    <div class="legend-item"><span class="box diamond"></span> จุดตัดสินใจ</div>
+                    <div class="legend-item"><span class="box rect primary"></span> ขั้นตอนหลัก</div>
+                    <div class="legend-item"><span class="box rect success"></span> ผลลัพธ์</div>
+                    <div class="legend-item"><span class="box rect danger"></span> ข้อควรระวัง</div>
+                    <div class="legend-item"><span class="box rect caution"></span> จุดอันตราย (ออกสอบบ่อย)</div>
+                </div>
+            </div>
+
+            <!-- Timeline / Flowchart View -->
+            <div id="timeline-container" class="timeline-wrapper" style="display: none;">
+                <div class="timeline-header">
+                    <h2><i class="ph ph-map-trifold"></i> ขั้นตอนการคิดวิเคราะห์ (Timeline)</h2>
+                    <p>ลำดับความคิดในการวินิจฉัยกฎหมายครอบครัว</p>
+                </div>
+                <div id="timeline-tree" class="timeline-tree"></div>
+            </div>
+
+            <!-- Mindmap Overview View -->
+            <div id="mindmap-container" class="mindmap-wrapper" style="display: none;">
+                <div class="mindmap-header">
+                    <h2><i class="ph ph-tree-structure"></i> แผนภาพความเชื่อมโยงเนื้อหา</h2>
+                    <p>ภาพรวมโครงสร้างเนื้อหากฎหมายครอบครัว (นำเมาส์วางเพื่อดูสรุป / คลิกเพื่ออ่านเนื้อหาเต็ม)</p>
+                </div>
+                <div id="mindmap-tree" class="mindmap-tree"></div>
+            </div>
+
+            <!-- Comparison Table View -->
+            <div id="compare-container" class="compare-wrapper" style="display: none;">
+                <div id="compare-content"></div>
+            </div>
+
+            <!-- Content Reading View -->
+            <div class="content-wrapper" id="content-area">
+                <div class="welcome-state">
+                    <i class="ph ph-books" style="font-size: 64px; color: var(--text-muted); margin-bottom: 24px;"></i>
+                    <h2>หายใจเข้าลึกๆ... แล้วมาลุยกัน! 📚</h2>
+                    <p>เลือกหัวข้อจากเมนูด้านซ้ายเพื่อเริ่มต้นทบทวนเนื้อหา</p>
+                </div>
+            </div>
+
+            <!-- Exam Viewer Container -->
+            <div id="exam-container" class="exam-container" style="display: none;">
+                <div class="exam-header">
+                    <div class="exam-header-left">
+                        <span id="exam-year" class="exam-year-badge">ปี 25xx</span>
+                        <h2 id="exam-title">ข้อสอบปลายภาค</h2>
+                    </div>
+                    <div class="exam-priority" id="exam-priority">⭐⭐⭐⭐⭐</div>
+                </div>
+                
+                <div class="exam-topics">
+                    <strong>หัวข้อที่ออกสอบ: </strong>
+                    <span id="exam-topics-list"></span>
+                </div>
+
+                <div class="exam-body">
+                    <div class="exam-question-box">
+                        <h3><i class="ph ph-file-text"></i> โจทย์ข้อสอบ</h3>
+                        <div id="exam-question" class="exam-text"></div>
+                    </div>
+                    
+                    <button id="exam-toggle-answer" class="btn-toggle-answer">
+                        <i class="ph ph-eye"></i> ดูธงคำตอบ / ประเด็นวินิจฉัย
+                    </button>
+                    
+                    <div id="exam-answer-box" class="exam-answer-box" style="display: none;">
+                        <h3><i class="ph ph-check-circle"></i> ธงคำตอบ</h3>
+                        <div id="exam-issue" class="exam-text"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Flow Node Popover (Hover) -->
+    <div id="flow-popover" class="flow-popover">
+        <h4 id="fp-title"></h4>
+        <div id="fp-detail-wrapper" class="fp-detail-wrapper">
+            <p id="fp-detail"></p>
+        </div>
+        <div id="fp-law-wrapper" class="fp-law-wrapper">
+            <div id="fp-law" class="fp-law"></div>
+        </div>
+        <div id="fp-source" class="fp-source">
+            <a href="#" id="fp-source-link" target="_blank">
+                <i class="ph ph-book-open-text"></i> อ่านตัวบทกฎหมายฉบับเต็ม
+            </a>
+        </div>
+    </div>
+
+    <!-- Mindmap Popover -->
+    <div id="mm-popover" class="mm-popover">
+        <h5 id="mm-title"></h5>
+        <p id="mm-summary"></p>
+        <div class="mm-popover-hint"><i class="ph-fill ph-cursor-click"></i> คลิกเพื่ออ่านเนื้อหาเต็ม</div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
